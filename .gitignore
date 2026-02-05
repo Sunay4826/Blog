@@ -1,0 +1,12 @@
+.DS_Store
+.env
+.env.*
+.dev.vars
+**/.dev.vars
+**/node_modules/
+**/dist/
+**/build/
+**/.turbo/
+**/.parcel-cache/
+**/.vite/
+**/*.tsbuildinfo
