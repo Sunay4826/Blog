@@ -7,6 +7,7 @@ import type { ChangeEvent } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
+import { createBlogInput } from "sunay-common";
 
 export const Publish = () => {
     const [title, setTitle] = useState("");
@@ -50,10 +51,19 @@ export const Publish = () => {
             navigate("/signin");
             return;
         }
-        const response = await axios.post(`${BACKEND_URL}/api/v1/blog`, {
+        const parsed = createBlogInput.safeParse({
             title,
             content,
             tags
+        });
+        if (!parsed.success) {
+            alert("Please enter a title and content.");
+            return;
+        }
+        const response = await axios.post(`${BACKEND_URL}/api/v1/blog`, {
+            title: parsed.data.title,
+            content: parsed.data.content,
+            tags: parsed.data.tags
         }, {
             headers: {
                 Authorization: token ? `Bearer ${token}` : ""

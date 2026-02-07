@@ -7,6 +7,7 @@ import axios from "axios";
 import { Appbar } from "../components/Appbar";
 import { BACKEND_URL } from "../config";
 import { getCurrentUserId, useBlog } from "../hooks/index.ts";
+import { updateBlogInput } from "sunay-common";
 
 export const EditBlog = () => {
   const { id } = useParams();
@@ -53,9 +54,19 @@ export const EditBlog = () => {
       .split(",")
       .map((tag) => tag.trim())
       .filter(Boolean);
+    const parsed = updateBlogInput.safeParse({
+      id,
+      title,
+      content: htmlContent,
+      tags
+    });
+    if (!parsed.success) {
+      alert("Please enter a title and content.");
+      return;
+    }
     await axios.put(
       `${BACKEND_URL}/api/v1/blog/${id}`,
-      { title, content: htmlContent, tags },
+      { title: parsed.data.title, content: parsed.data.content, tags: parsed.data.tags },
       {
         headers: {
           Authorization: token ? `Bearer ${token}` : "",

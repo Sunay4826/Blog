@@ -2,54 +2,7 @@ import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { Hono } from "hono";
 import { verify } from "hono/jwt";
-
-type CreateBlogInput = {
-    title: string;
-    content: string;
-    tags?: string[];
-};
-
-type UpdateBlogInput = {
-    id: string;
-    title?: string;
-    content?: string;
-    tags?: string[];
-    published?: boolean;
-};
-
-const isCreateBlogInput = (body: unknown): body is CreateBlogInput => {
-    if (!body || typeof body !== "object") {
-        return false;
-    }
-    const data = body as { title?: unknown; content?: unknown; tags?: unknown };
-    return (
-        typeof data.title === "string" &&
-        typeof data.content === "string" &&
-        (data.tags === undefined ||
-            (Array.isArray(data.tags) && data.tags.every((tag) => typeof tag === "string")))
-    );
-};
-
-const isUpdateBlogInput = (body: unknown): body is UpdateBlogInput => {
-    if (!body || typeof body !== "object") {
-        return false;
-    }
-    const data = body as {
-        id?: unknown;
-        title?: unknown;
-        content?: unknown;
-        tags?: unknown;
-        published?: unknown;
-    };
-    return (
-        typeof data.id === "string" &&
-        (data.title === undefined || typeof data.title === "string") &&
-        (data.content === undefined || typeof data.content === "string") &&
-        (data.tags === undefined ||
-            (Array.isArray(data.tags) && data.tags.every((tag) => typeof tag === "string"))) &&
-        (data.published === undefined || typeof data.published === "boolean")
-    );
-};
+import { createBlogInput, updateBlogInput } from "sunay-common";
 
 export const blogRouter = new Hono<{
     Bindings: {
@@ -96,12 +49,14 @@ blogRouter.use("/*", async (c, next) => {
 
 blogRouter.post('/', async (c) => {
     const body = await c.req.json();
-    if (!isCreateBlogInput(body)) {
+    const parsed = createBlogInput.safeParse(body);
+    if (!parsed.success) {
         c.status(411);
         return c.json({
             message: "Inputs not correct"
         })
     }
+    const data = parsed.data;
 
     const authorId = c.get("userId");
     const prisma = new PrismaClient({
@@ -110,10 +65,10 @@ blogRouter.post('/', async (c) => {
 
     const blog = await prisma.post.create({
         data: {
-            title: body.title,
-            content: body.content,
+            title: data.title,
+            content: data.content,
             authorId,
-            tags: body.tags ?? []
+            tags: data.tags ?? []
         }
     })
 
@@ -125,12 +80,14 @@ blogRouter.post('/', async (c) => {
 blogRouter.put('/:id', async (c) => {
     const body = await c.req.json();
     const id = c.req.param("id");
-    if (!isUpdateBlogInput({ ...body, id })) {
+    const parsed = updateBlogInput.safeParse({ ...body, id });
+    if (!parsed.success) {
         c.status(411);
         return c.json({
             message: "Inputs not correct"
         })
     }
+    const data = parsed.data;
 
     const prisma = new PrismaClient({
         accelerateUrl: c.env.PRISMA_ACCELERATE_URL,
@@ -146,18 +103,18 @@ blogRouter.put('/:id', async (c) => {
         return c.json({ message: "Not allowed" });
     }
 
-    const data: Record<string, unknown> = {
-        title: body.title,
-        content: body.content,
+    const updateData: Record<string, unknown> = {
+        title: data.title,
+        content: data.content,
         published: body.published
     };
-    if (body.tags) {
-        data.tags = body.tags;
+    if (data.tags) {
+        updateData.tags = data.tags;
     }
 
     const updated = await prisma.post.update({
         where: { id },
-        data
+        data: updateData
     })
 
     return c.json({

@@ -3,17 +3,8 @@ import type { ChangeEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { BACKEND_URL } from "../config.ts";
-
-type SignupInput = {
-    name?: string;
-    email: string;
-    password: string;
-};
-
-type SigninInput = {
-    email: string;
-    password: string;
-};
+import { signupInput, signinInput } from "sunay-common";
+import type { SignupInput, SigninInput } from "sunay-common";
 
 export const Auth = ({ type }: { type: "signup" | "signin" }) => {
     const navigate = useNavigate();
@@ -29,10 +20,18 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
                 type === "signup"
                     ? postInputs
                     : { email: postInputs.email, password: postInputs.password };
+            const parsed =
+                type === "signup"
+                    ? signupInput.safeParse(payload)
+                    : signinInput.safeParse(payload);
+            if (!parsed.success) {
+                alert("Please enter valid details.");
+                return;
+            }
 
             const response = await axios.post(
                 `${BACKEND_URL}/api/v1/user/${type === "signup" ? "signup" : "signin"}`,
-                payload
+                parsed.data
             );
             const jwt = response.data;
             localStorage.setItem("token", jwt);
