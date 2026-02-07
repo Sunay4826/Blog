@@ -1,1 +1,71 @@
 @import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg: #f6f1e7;
+    --surface: #fdfaf4;
+    --surface-alt: #f1e7d6;
+    --border: #e4d6bf;
+    --text: #2a2218;
+    --muted: #6a5740;
+    --muted-2: #8a7356;
+    --accent: #2a2218;
+    --accent-contrast: #fdfaf4;
+    --accent-soft: #c7b08d;
+    --danger: #b91c1c;
+    --link: #7a5b2a;
+    --chip: #fdfaf4;
+  }
+
+  .theme-dark {
+    --bg: #0b0a08;
+    --surface: #15110c;
+    --surface-alt: #1c1711;
+    --border: #3b3022;
+    --text: #f3ede2;
+    --muted: #c7b08d;
+    --muted-2: #9a8565;
+    --accent: #c9a36a;
+    --accent-contrast: #1a140c;
+    --accent-soft: #5b4a34;
+    --danger: #fca5a5;
+    --link: #d8b27a;
+    --chip: #15110c;
+  }
+
+  body {
+    @apply bg-[var(--bg)] text-[var(--text)];
+  }
+
+  .tiptap {
+    @apply text-sm text-[var(--text)];
+  }
+
+  .tiptap h1 {
+    @apply text-2xl font-semibold;
+  }
+
+  .tiptap h2 {
+    @apply text-xl font-semibold;
+  }
+
+  .tiptap h3 {
+    @apply text-lg font-semibold;
+  }
+
+  .tiptap p {
+    @apply leading-7 text-[var(--text)];
+  }
+
+  .tiptap ul {
+    @apply list-disc pl-6 text-[var(--text)];
+  }
+
+  .tiptap ol {
+    @apply list-decimal pl-6 text-[var(--text)];
+  }
+
+  .tiptap blockquote {
+    @apply border-l-2 border-[var(--border)] pl-4 italic text-[var(--muted)];
+  }
+}
