@@ -5,6 +5,7 @@ import { useBlogs } from "../hooks/index.ts";
 import axios from "axios";
 import { BACKEND_URL } from "../config";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const dummyBlogs = [
     {
@@ -46,6 +47,7 @@ const dummyBlogs = [
 ];
 
 export const Blogs = () => {
+    const navigate = useNavigate();
     const [search, setSearch] = useState("");
     const [author, setAuthor] = useState("");
     const [sort, setSort] = useState("newest");
@@ -165,7 +167,25 @@ export const Blogs = () => {
                 </div>
                 {error ? (
                     <div className="mt-6 rounded-2xl border border-[var(--border)] bg-[var(--surface)] px-6 py-4 text-sm text-[var(--danger)]">
-                        {error}
+                        <div>{error}</div>
+                        {error.toLowerCase().includes("not logged in") ? (
+                            <div className="mt-3 flex flex-wrap gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => navigate("/signin")}
+                                    className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--accent-contrast)] transition hover:opacity-90"
+                                >
+                                    Log in
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => navigate("/signup")}
+                                    className="rounded-lg border border-[var(--accent-soft)] px-4 py-2 text-sm font-semibold text-[var(--muted)] hover:border-[var(--accent)] hover:text-[var(--text)]"
+                                >
+                                    Sign up
+                                </button>
+                            </div>
+                        ) : null}
                     </div>
                 ) : null}
                 {!error && blogs.length === 0 ? (
