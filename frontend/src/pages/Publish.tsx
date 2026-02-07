@@ -2,7 +2,7 @@ import { Appbar } from "../components/Appbar"
 import axios from "axios";
 import { BACKEND_URL } from "../config";
 import { useNavigate } from "react-router-dom";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { ChangeEvent } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -12,6 +12,13 @@ export const Publish = () => {
     const [title, setTitle] = useState("");
     const [tagsInput, setTagsInput] = useState("");
     const navigate = useNavigate();
+
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            navigate("/signin");
+        }
+    }, [navigate]);
 
     const handleTitleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         setTitle(e.target.value);
@@ -39,6 +46,10 @@ export const Publish = () => {
             .map((tag) => tag.trim())
             .filter(Boolean);
         const token = localStorage.getItem("token");
+        if (!token) {
+            navigate("/signin");
+            return;
+        }
         const response = await axios.post(`${BACKEND_URL}/api/v1/blog`, {
             title,
             content,

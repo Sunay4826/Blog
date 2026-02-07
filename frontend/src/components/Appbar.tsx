@@ -52,7 +52,7 @@ export const Appbar = memo(() => {
             <span className="text-base">{isDark ? "☀️" : "🌙"}</span>
           </button>
           <Link
-            to="/publish"
+            to={localStorage.getItem("token") ? "/publish" : "/signin"}
             className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--accent-contrast)] shadow-sm hover:opacity-90"
           >
             New

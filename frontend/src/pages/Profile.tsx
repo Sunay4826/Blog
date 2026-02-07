@@ -30,11 +30,32 @@ export const Profile = () => {
     );
   }
   if (error) {
+    const isAuthError = error.toLowerCase().includes("not logged in");
     return (
       <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
         <Appbar />
-        <div className="mx-auto max-w-3xl px-6 py-10 text-sm text-[var(--danger)]">
-          {error}
+        <div className="mx-auto max-w-3xl px-6 py-10">
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--surface)] px-6 py-5 text-sm text-[var(--danger)]">
+            {error}
+          </div>
+          {isAuthError ? (
+            <div className="mt-4 flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() => navigate("/signin")}
+                className="rounded-lg bg-[var(--accent)] px-4 py-2.5 text-sm font-semibold text-[var(--accent-contrast)] transition hover:opacity-90"
+              >
+                Log in
+              </button>
+              <button
+                type="button"
+                onClick={() => navigate("/signup")}
+                className="rounded-lg border border-[var(--accent-soft)] px-4 py-2.5 text-sm font-semibold text-[var(--muted)] hover:border-[var(--accent)] hover:text-[var(--text)]"
+              >
+                Sign up
+              </button>
+            </div>
+          ) : null}
         </div>
       </div>
     );
