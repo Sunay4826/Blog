@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { PrismaClient } from '@prisma/client/edge'
 import { withAccelerate } from '@prisma/extension-accelerate'
-import { sign } from 'hono/jwt'
+import { sign, verify } from 'hono/jwt'
 
 type SignupInput = {
   email: string;
@@ -42,6 +42,20 @@ export const userRouter = new Hono<{
     }
 }>();
 
+const getUserIdFromAuth = async (c: { req: { header: (name: string) => string | undefined }, env: { JWT_SECRET: string } }) => {
+  const authHeader = c.req.header("Authorization") || "";
+  const token = authHeader.startsWith("Bearer ")
+    ? authHeader.slice(7)
+    : authHeader;
+  if (!token) return null;
+  try {
+    const user = await verify(token, c.env.JWT_SECRET, "HS256");
+    return (user as { id?: string }).id ?? null;
+  } catch {
+    return null;
+  }
+};
+
 userRouter.post('/signup', async (c) => {
     try {
       const body = await c.req.json();
@@ -53,7 +67,7 @@ userRouter.post('/signup', async (c) => {
       }
       const prisma = new PrismaClient({
         accelerateUrl: c.env.PRISMA_ACCELERATE_URL,
-      }).$extends(withAccelerate())
+      }).$extends(withAccelerate()) as any
 
       const user = await prisma.user.create({
         data: {
@@ -87,7 +101,7 @@ userRouter.post('/signup', async (c) => {
 
       const prisma = new PrismaClient({
         accelerateUrl: c.env.PRISMA_ACCELERATE_URL,
-      }).$extends(withAccelerate())
+      }).$extends(withAccelerate()) as any
 
       const user = await prisma.user.findFirst({
         where: {
@@ -112,3 +126,44 @@ userRouter.post('/signup', async (c) => {
       return c.text('Invalid')
     }
   })
+
+userRouter.get('/profile', async (c) => {
+  const userId = await getUserIdFromAuth(c);
+  if (!userId) {
+    c.status(403);
+    return c.json({ message: "You are not logged in" });
+  }
+
+  const prisma = new PrismaClient({
+    accelerateUrl: c.env.PRISMA_ACCELERATE_URL,
+  }).$extends(withAccelerate()) as any
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      bio: true,
+      _count: { select: { posts: true } }
+    }
+  })
+
+  if (!user) {
+    c.status(404);
+    return c.json({ message: "User not found" });
+  }
+
+  const likesReceived = await prisma.like.count({
+    where: {
+      post: { authorId: userId }
+    }
+  });
+
+  return c.json({
+    username: user.name ?? user.email,
+    bio: user.bio ?? "",
+    totalBlogs: user._count.posts,
+    likesReceived
+  });
+})
