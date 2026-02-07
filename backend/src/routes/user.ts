@@ -32,8 +32,9 @@ userRouter.post('/signup', async (c) => {
       const parsed = signupInput.safeParse(body);
       if (!parsed.success) {
           c.status(411);
+          const issue = parsed.error.issues[0];
           return c.json({
-              message: "Inputs not correct"
+              message: issue?.message ?? "Inputs not correct"
           })
       }
       const data = parsed.data;
@@ -67,8 +68,9 @@ userRouter.post('/signup', async (c) => {
       const parsed = signinInput.safeParse(body);
       if (!parsed.success) {
           c.status(411);
+          const issue = parsed.error.issues[0];
           return c.json({
-              message: "Inputs not correct"
+              message: issue?.message ?? "Inputs not correct"
           })
       }
       const data = parsed.data;

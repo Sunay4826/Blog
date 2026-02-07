@@ -1,16 +1,20 @@
 import z from "zod";
 
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{6,}$/;
+const passwordMessage =
+    "Password must be at least 6 characters and include uppercase, lowercase, number, and special character.";
+
 export const signupInput = z.object({
-    email: z.string().email(),
-    password: z.string().min(6),
+    email: z.string().email("Email is invalid"),
+    password: z.string().regex(passwordRegex, passwordMessage),
     name: z.string().optional()
 })
 
 export type SignupInput = z.infer<typeof signupInput>
 
 export const signinInput = z.object({
-    email: z.string().email(),
-    password: z.string().min(6),
+    email: z.string().email("Email is invalid"),
+    password: z.string().min(1, "Password is required"),
 })
 
 export type SigninInput = z.infer<typeof signinInput>

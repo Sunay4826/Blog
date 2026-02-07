@@ -16,6 +16,21 @@ type SigninInput = {
     password: string;
 };
 
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{6,}$/;
+const passwordMessage =
+    "Password must be at least 6 characters and include uppercase, lowercase, number, and special character.";
+
+const signupSchema = z.object({
+    email: z.string().email("Email is invalid"),
+    password: z.string().regex(passwordRegex, passwordMessage),
+    name: z.string().optional()
+});
+
+const signinSchema = z.object({
+    email: z.string().email("Email is invalid"),
+    password: z.string().min(1, "Password is required")
+});
+
 export const Auth = ({ type }: { type: "signup" | "signin" }) => {
     const navigate = useNavigate();
     const [postInputs, setPostInputs] = useState<SignupInput>({
@@ -23,6 +38,12 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
         email: "",
         password: ""
     });
+    const [errors, setErrors] = useState<{
+        name?: string;
+        email?: string;
+        password?: string;
+        form?: string;
+    }>({});
 
     const sendRequest = useCallback(async () => {
         try {
@@ -30,23 +51,26 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
                 type === "signup"
                     ? postInputs
                     : { email: postInputs.email, password: postInputs.password };
-            const signupSchema = z.object({
-                email: z.string().email(),
-                password: z.string().min(6),
-                name: z.string().optional()
-            });
-            const signinSchema = z.object({
-                email: z.string().email(),
-                password: z.string().min(6)
-            });
             const parsed =
                 type === "signup"
                     ? signupSchema.safeParse(payload)
                     : signinSchema.safeParse(payload);
             if (!parsed.success) {
-                alert("Please enter valid details.");
+                const fieldErrors: {
+                    name?: string;
+                    email?: string;
+                    password?: string;
+                } = {};
+                for (const issue of parsed.error.issues) {
+                    const field = issue.path[0];
+                    if (field === "name") fieldErrors.name = issue.message;
+                    if (field === "email") fieldErrors.email = issue.message;
+                    if (field === "password") fieldErrors.password = issue.message;
+                }
+                setErrors(fieldErrors);
                 return;
             }
+            setErrors({});
 
             const response = await axios.post(
                 `${BACKEND_URL}/api/v1/user/${type === "signup" ? "signup" : "signin"}`,
@@ -56,8 +80,11 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
             localStorage.setItem("token", jwt);
             navigate("/blogs");
         } catch(e) {
-            alert("Error while signing up")
-            // alert the user here that the request failed
+            setErrors({
+                form:
+                    (e as { response?: { data?: { message?: string } } })?.response
+                        ?.data?.message || "Unable to sign in."
+            });
         }
     }, [navigate, postInputs, type]);
 
@@ -66,6 +93,7 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
             ...prev,
             name: e.target.value
         }));
+        setErrors((prev) => ({ ...prev, name: undefined, form: undefined }));
     }, []);
 
     const handleEmailChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -73,6 +101,7 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
             ...prev,
             email: e.target.value
         }));
+        setErrors((prev) => ({ ...prev, email: undefined, form: undefined }));
     }, []);
 
     const handlePasswordChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
@@ -80,6 +109,7 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
             ...prev,
             password: e.target.value
         }));
+        setErrors((prev) => ({ ...prev, password: undefined, form: undefined }));
     }, []);
     
     return (
@@ -96,23 +126,31 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
                 </div>
             </div>
             <div className="pt-8">
+                {errors.form ? (
+                    <div className="mb-4 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-sm text-[var(--danger)]">
+                        {errors.form}
+                    </div>
+                ) : null}
                 {type === "signup" ? (
                     <LabelledInput
                         label="Name"
                         placeholder="Sunay Revad..."
                         onChange={handleNameChange}
+                        error={errors.name}
                     />
                 ) : null}
                 <LabelledInput
                     label="Email"
                     placeholder="sunayrevad@gmail.com"
                     onChange={handleEmailChange}
+                    error={errors.email}
                 />
                 <LabelledInput
                     label="Password"
                     type="password"
                     placeholder="••••••••"
                     onChange={handlePasswordChange}
+                    error={errors.password}
                 />
                 <button
                     onClick={sendRequest}
@@ -131,9 +169,10 @@ interface LabelledInputType {
     placeholder: string;
     onChange: (e: ChangeEvent<HTMLInputElement>) => void;
     type?: string;
+    error?: string;
 }
 
-function LabelledInput({ label, placeholder, onChange, type }: LabelledInputType) {
+function LabelledInput({ label, placeholder, onChange, type, error }: LabelledInputType) {
     return (
         <div className="pt-4">
             <label className="mb-2 block text-sm font-semibold text-[var(--text)]">
@@ -142,10 +181,15 @@ function LabelledInput({ label, placeholder, onChange, type }: LabelledInputType
             <input
                 onChange={onChange}
                 type={type || "text"}
-                className="block w-full rounded-lg border border-[var(--border)] bg-[var(--surface)] px-4 py-2.5 text-sm text-[var(--text)] placeholder:text-[var(--muted-2)] focus:border-[var(--accent)] focus:outline-none"
+                className={`block w-full rounded-lg border bg-[var(--surface)] px-4 py-2.5 text-sm text-[var(--text)] placeholder:text-[var(--muted-2)] focus:border-[var(--accent)] focus:outline-none ${
+                    error ? "border-[var(--danger)]" : "border-[var(--border)]"
+                }`}
                 placeholder={placeholder}
                 required
             />
+            {error ? (
+                <div className="mt-2 text-xs text-[var(--danger)]">{error}</div>
+            ) : null}
         </div>
     )
 }
