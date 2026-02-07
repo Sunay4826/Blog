@@ -167,3 +167,29 @@ userRouter.get('/profile', async (c) => {
     likesReceived
   });
 })
+
+userRouter.put('/profile', async (c) => {
+  const userId = await getUserIdFromAuth(c);
+  if (!userId) {
+    c.status(403);
+    return c.json({ message: "You are not logged in" });
+  }
+
+  const body = await c.req.json();
+  const name = typeof body?.name === "string" ? body.name.trim() : "";
+  if (!name) {
+    c.status(411);
+    return c.json({ message: "Name is required" });
+  }
+
+  const prisma = new PrismaClient({
+    accelerateUrl: c.env.PRISMA_ACCELERATE_URL,
+  }).$extends(withAccelerate()) as any
+
+  const updated = await prisma.user.update({
+    where: { id: userId },
+    data: { name }
+  })
+
+  return c.json({ username: updated.name ?? "" });
+})
