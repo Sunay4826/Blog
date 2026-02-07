@@ -7,7 +7,7 @@ import axios from "axios";
 import { Appbar } from "../components/Appbar";
 import { BACKEND_URL } from "../config";
 import { getCurrentUserId, useBlog } from "../hooks/index.ts";
-import { updateBlogInput } from "sunay-common";
+import { z } from "zod";
 
 export const EditBlog = () => {
   const { id } = useParams();
@@ -54,7 +54,13 @@ export const EditBlog = () => {
       .split(",")
       .map((tag) => tag.trim())
       .filter(Boolean);
-    const parsed = updateBlogInput.safeParse({
+    const updateBlogSchema = z.object({
+      id: z.string(),
+      title: z.string().min(1).optional(),
+      content: z.string().min(1).optional(),
+      tags: z.array(z.string()).optional()
+    });
+    const parsed = updateBlogSchema.safeParse({
       id,
       title,
       content: htmlContent,

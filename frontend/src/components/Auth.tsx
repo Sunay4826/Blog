@@ -3,8 +3,18 @@ import type { ChangeEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { BACKEND_URL } from "../config.ts";
-import { signupInput, signinInput } from "sunay-common";
-import type { SignupInput, SigninInput } from "sunay-common";
+import { z } from "zod";
+
+type SignupInput = {
+    name?: string;
+    email: string;
+    password: string;
+};
+
+type SigninInput = {
+    email: string;
+    password: string;
+};
 
 export const Auth = ({ type }: { type: "signup" | "signin" }) => {
     const navigate = useNavigate();
@@ -20,10 +30,19 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
                 type === "signup"
                     ? postInputs
                     : { email: postInputs.email, password: postInputs.password };
+            const signupSchema = z.object({
+                email: z.string().email(),
+                password: z.string().min(6),
+                name: z.string().optional()
+            });
+            const signinSchema = z.object({
+                email: z.string().email(),
+                password: z.string().min(6)
+            });
             const parsed =
                 type === "signup"
-                    ? signupInput.safeParse(payload)
-                    : signinInput.safeParse(payload);
+                    ? signupSchema.safeParse(payload)
+                    : signinSchema.safeParse(payload);
             if (!parsed.success) {
                 alert("Please enter valid details.");
                 return;

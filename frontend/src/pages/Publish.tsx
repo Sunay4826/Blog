@@ -7,7 +7,7 @@ import type { ChangeEvent } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
-import { createBlogInput } from "sunay-common";
+import { z } from "zod";
 
 export const Publish = () => {
     const [title, setTitle] = useState("");
@@ -51,7 +51,12 @@ export const Publish = () => {
             navigate("/signin");
             return;
         }
-        const parsed = createBlogInput.safeParse({
+        const createBlogSchema = z.object({
+            title: z.string().min(1),
+            content: z.string().min(1),
+            tags: z.array(z.string()).optional()
+        });
+        const parsed = createBlogSchema.safeParse({
             title,
             content,
             tags
