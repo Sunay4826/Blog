@@ -1,9 +1,19 @@
 import { useCallback, useState } from "react";
 import type { ChangeEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import type { SignupInput, SigninInput } from "sunay-common";
 import axios from "axios";
 import { BACKEND_URL } from "../config.ts";
+
+type SignupInput = {
+    name?: string;
+    email: string;
+    password: string;
+};
+
+type SigninInput = {
+    email: string;
+    password: string;
+};
 
 export const Auth = ({ type }: { type: "signup" | "signin" }) => {
     const navigate = useNavigate();
