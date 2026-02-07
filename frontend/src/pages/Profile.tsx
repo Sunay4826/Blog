@@ -4,9 +4,11 @@ import { Spinner } from "../components/Spinner.tsx";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { BACKEND_URL } from "../config";
+import { useNavigate } from "react-router-dom";
 
 export const Profile = () => {
   const { loading, profile, error } = useProfile();
+  const navigate = useNavigate();
   const [name, setName] = useState("");
   const [saving, setSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
@@ -98,6 +100,18 @@ export const Profile = () => {
           ) : null}
           <div className="mt-2 text-sm text-[var(--muted)]">
             {profile.bio || "No bio yet."}
+          </div>
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                localStorage.removeItem("token");
+                navigate("/signin");
+              }}
+              className="rounded-lg border border-[var(--accent-soft)] px-4 py-2 text-sm font-semibold text-[var(--muted)] hover:border-[var(--accent)] hover:text-[var(--text)]"
+            >
+              Log out
+            </button>
           </div>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             <div className="rounded-lg border border-[var(--border)] bg-[var(--surface-alt)] p-4">

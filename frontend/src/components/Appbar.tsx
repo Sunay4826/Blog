@@ -1,9 +1,8 @@
 import { memo, useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export const Appbar = memo(() => {
   const [isDark, setIsDark] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const saved = localStorage.getItem("theme");
@@ -51,16 +50,6 @@ export const Appbar = memo(() => {
             className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--accent-soft)] text-[var(--muted)] hover:border-[var(--accent)] hover:text-[var(--text)]"
           >
             <span className="text-base">{isDark ? "☀️" : "🌙"}</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              localStorage.removeItem("token");
-              navigate("/signin");
-            }}
-            className="rounded-full border border-[var(--accent-soft)] px-4 py-2 text-sm font-semibold text-[var(--muted)] hover:border-[var(--accent)] hover:text-[var(--text)]"
-          >
-            Log out
           </button>
           <Link
             to="/publish"
