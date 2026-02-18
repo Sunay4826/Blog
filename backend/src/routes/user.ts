@@ -31,7 +31,7 @@ userRouter.post('/signup', async (c) => {
       const body = await c.req.json();
       const parsed = signupInput.safeParse(body);
       if (!parsed.success) {
-          c.status(411);
+          c.status(400);
           const issue = parsed.error.issues[0];
           return c.json({
               message: issue?.message ?? "Inputs not correct"
@@ -56,18 +56,23 @@ userRouter.post('/signup', async (c) => {
       return c.text(jwt)
     } catch(e) {
       console.log(e);
-      c.status(411);
-      return c.text('Invalid')
+      const message = e instanceof Error ? e.message : "";
+      if (message.includes("Unique constraint failed")) {
+        c.status(409);
+        return c.json({ message: "User already exists" });
+      }
+      c.status(500);
+      return c.json({ message: "Internal server error" });
     }
   })
   
   
-  userRouter.post('/signin', async (c) => {
+userRouter.post('/signin', async (c) => {
     try {
       const body = await c.req.json();
       const parsed = signinInput.safeParse(body);
       if (!parsed.success) {
-          c.status(411);
+          c.status(400);
           const issue = parsed.error.issues[0];
           return c.json({
               message: issue?.message ?? "Inputs not correct"
@@ -98,8 +103,8 @@ userRouter.post('/signup', async (c) => {
       return c.text(jwt)
     } catch(e) {
       console.log(e);
-      c.status(411);
-      return c.text('Invalid')
+      c.status(500);
+      return c.json({ message: "Internal server error" });
     }
   })
 
@@ -154,7 +159,7 @@ userRouter.put('/profile', async (c) => {
   const body = await c.req.json();
   const parsed = updateProfileInput.safeParse(body);
   if (!parsed.success) {
-    c.status(411);
+    c.status(400);
     return c.json({ message: "Name is required" });
   }
   const name = parsed.data.name.trim();

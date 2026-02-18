@@ -1,6 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "backend",
+  "account_id": "3ac39cef2a9ec201753f1729f8b97366",
   "main": "src/index.ts",
   "compatibility_date": "2026-01-29",
   "compatibility_flags": ["nodejs_compat"],
