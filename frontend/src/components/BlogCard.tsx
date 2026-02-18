@@ -30,19 +30,19 @@ export const BlogCard = memo(({
     onToggleBookmark,
 }: BlogCardProps) => {
     const navigate = useNavigate();
-    return <Link to={`/blog/${id}`}>
-        <div className="group w-full border-b border-[var(--border)] px-6 py-6 transition hover:bg-[var(--surface-alt)] hover:shadow-sm last:border-b-0">
-            <div className="flex items-center">
+    return <Link to={`/blog/${id}`} className="block">
+        <div className="group w-full border-b border-[var(--border)] px-6 py-6 transition duration-200 hover:-translate-y-0.5 hover:bg-[var(--surface-alt)] hover:shadow-[0_14px_30px_-24px_var(--text)] last:border-b-0">
+            <div className="flex items-center gap-2">
                 <Avatar name={authorName} />
-                <div className="pl-2 text-sm text-[var(--muted)]">{authorName}</div>
+                <div className="text-sm font-medium text-[var(--muted)]">{authorName}</div>
             </div>
-            <div className="pt-3 text-[20px] font-semibold leading-tight text-[var(--text)]">
+            <div className="pt-3 text-[22px] font-bold leading-tight tracking-tight text-[var(--text)]">
                 {title}
             </div>
             <div className="pt-2 text-sm leading-relaxed text-[var(--muted)]">
-                {stripHtml(content).slice(0, 120) + "..."}
+                {stripHtml(content).slice(0, 150) + "..."}
             </div>
-            <div className="pt-4 text-xs text-[var(--muted-2)]">
+            <div className="pt-4 text-xs font-medium text-[var(--muted-2)]">
                 {`${Math.ceil(content.length / 100)} minute(s) read`}
             </div>
             {tags?.length ? (
@@ -50,7 +50,7 @@ export const BlogCard = memo(({
                     {tags.slice(0, 4).map((tag) => (
                         <span
                             key={tag}
-                            className="rounded-full border border-[var(--border)] bg-[var(--chip)] px-2.5 py-0.5 text-[11px] font-semibold text-[var(--muted)]"
+                            className="rounded-full border border-[var(--border)] bg-[var(--chip)] px-2.5 py-0.5 text-[11px] font-semibold tracking-wide text-[var(--muted)]"
                         >
                             #{tag}
                         </span>
@@ -64,7 +64,7 @@ export const BlogCard = memo(({
                         event.preventDefault();
                         onToggleLike?.(id, likedByMe);
                     }}
-                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold shadow-sm transition ${
+                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold shadow-sm transition hover:-translate-y-0.5 ${
                         likedByMe
                             ? "border-[var(--accent)] bg-[var(--surface-alt)] text-[var(--text)]"
                             : "border-[var(--accent-soft)] bg-[var(--surface)] text-[var(--muted)] hover:border-[var(--accent)]"
@@ -80,7 +80,7 @@ export const BlogCard = memo(({
                         event.preventDefault();
                         onToggleBookmark?.(id, bookmarkedByMe);
                     }}
-                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold shadow-sm transition ${
+                    className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold shadow-sm transition hover:-translate-y-0.5 ${
                         bookmarkedByMe
                             ? "border-[var(--text)] bg-[var(--text)] text-[var(--accent-contrast)]"
                             : "border-[var(--accent-soft)] bg-[var(--surface)] text-[var(--muted)] hover:border-[var(--accent)]"
@@ -96,7 +96,7 @@ export const BlogCard = memo(({
                         event.preventDefault();
                         navigate(`/blog/${id}`);
                     }}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-[var(--accent-soft)] bg-[var(--surface)] px-3 py-1.5 text-xs font-semibold text-[var(--muted)] shadow-sm transition hover:border-[var(--accent)]"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-[var(--accent-soft)] bg-[var(--surface)] px-3 py-1.5 text-xs font-semibold text-[var(--muted)] shadow-sm transition hover:-translate-y-0.5 hover:border-[var(--accent)]"
                 >
                     <span>💬</span>
                     <span>Comments</span>
@@ -109,7 +109,7 @@ export const BlogCard = memo(({
 export function Avatar({ name, size = "small" }: { name: string, size?: "small" | "big" }) {
     return (
         <div
-            className={`relative inline-flex items-center justify-center overflow-hidden rounded-full bg-[var(--surface-alt)] ${size === "small" ? "h-6 w-6" : "h-10 w-10"}`}
+            className={`relative inline-flex items-center justify-center overflow-hidden rounded-full border border-[var(--accent-soft)] bg-[color-mix(in_oklab,var(--accent-soft)_30%,var(--surface))] ${size === "small" ? "h-6 w-6" : "h-10 w-10"}`}
         >
             <span className={`${size === "small" ? "text-xs" : "text-md"} font-medium text-[var(--text)]`}>
                 {name[0]}

@@ -19,27 +19,30 @@ export const Appbar = memo(() => {
   };
 
   return (
-    <div className="border-b border-[var(--border)] bg-[var(--surface)] px-6 py-4">
-      <div className="mx-auto flex max-w-5xl items-center justify-between">
-        <Link to="/blogs" className="text-lg font-semibold text-[var(--text)]">
-          Blog
+    <div className="sticky top-0 z-40 border-b border-[var(--border)] bg-[color-mix(in_oklab,var(--surface)_78%,transparent)] px-4 py-4 backdrop-blur-xl sm:px-6">
+      <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3">
+        <Link
+          to="/blogs"
+          className="bg-gradient-to-r from-[var(--text)] to-[var(--link)] bg-clip-text text-xl font-extrabold tracking-tight text-transparent"
+        >
+          Inkspire
         </Link>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           <Link
             to="/saved"
-            className="rounded-full border border-[var(--accent-soft)] px-4 py-2 text-sm font-semibold text-[var(--muted)] hover:border-[var(--accent)] hover:text-[var(--text)]"
+            className="rounded-full border border-[var(--accent-soft)] bg-[var(--surface)] px-4 py-2 text-sm font-semibold text-[var(--muted)] hover:-translate-y-0.5 hover:border-[var(--accent)] hover:text-[var(--text)]"
           >
             Saved
           </Link>
           <Link
             to="/profile"
-            className="rounded-full border border-[var(--accent-soft)] px-4 py-2 text-sm font-semibold text-[var(--muted)] hover:border-[var(--accent)] hover:text-[var(--text)]"
+            className="rounded-full border border-[var(--accent-soft)] bg-[var(--surface)] px-4 py-2 text-sm font-semibold text-[var(--muted)] hover:-translate-y-0.5 hover:border-[var(--accent)] hover:text-[var(--text)]"
           >
             Profile
           </Link>
           <Link
             to="/my-blogs"
-            className="rounded-full border border-[var(--accent-soft)] px-4 py-2 text-sm font-semibold text-[var(--muted)] hover:border-[var(--accent)] hover:text-[var(--text)]"
+            className="rounded-full border border-[var(--accent-soft)] bg-[var(--surface)] px-4 py-2 text-sm font-semibold text-[var(--muted)] hover:-translate-y-0.5 hover:border-[var(--accent)] hover:text-[var(--text)]"
           >
             My blogs
           </Link>
@@ -47,13 +50,13 @@ export const Appbar = memo(() => {
             type="button"
             onClick={toggleTheme}
             aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--accent-soft)] text-[var(--muted)] hover:border-[var(--accent)] hover:text-[var(--text)]"
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-[var(--accent-soft)] bg-[var(--surface)] text-[var(--muted)] hover:-translate-y-0.5 hover:border-[var(--accent)] hover:text-[var(--text)]"
           >
             <span className="text-base">{isDark ? "☀️" : "🌙"}</span>
           </button>
           <Link
             to={localStorage.getItem("token") ? "/publish" : "/signin"}
-            className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--accent-contrast)] shadow-sm hover:opacity-90"
+            className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--accent-contrast)] shadow-[0_8px_24px_-12px_var(--accent)] hover:-translate-y-0.5 hover:opacity-95"
           >
             New
           </Link>

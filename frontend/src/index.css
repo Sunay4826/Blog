@@ -1,71 +1,99 @@
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
 
 @layer base {
   :root {
-    --bg: #f6f1e7;
-    --surface: #fdfaf4;
-    --surface-alt: #f1e7d6;
-    --border: #e4d6bf;
-    --text: #2a2218;
-    --muted: #6a5740;
-    --muted-2: #8a7356;
-    --accent: #2a2218;
-    --accent-contrast: #fdfaf4;
-    --accent-soft: #c7b08d;
+    --bg: #f7f4ee;
+    --surface: #fffdf8;
+    --surface-alt: #f2eadc;
+    --border: #e2d5c2;
+    --text: #221d15;
+    --muted: #655744;
+    --muted-2: #897860;
+    --accent: #1f3f6f;
+    --accent-contrast: #f8fbff;
+    --accent-soft: #c3d4eb;
     --danger: #b91c1c;
-    --link: #7a5b2a;
-    --chip: #fdfaf4;
+    --link: #275594;
+    --chip: #fffdf8;
   }
 
   .theme-dark {
-    --bg: #0b0a08;
-    --surface: #15110c;
-    --surface-alt: #1c1711;
-    --border: #3b3022;
-    --text: #f3ede2;
-    --muted: #c7b08d;
-    --muted-2: #9a8565;
-    --accent: #c9a36a;
-    --accent-contrast: #1a140c;
-    --accent-soft: #5b4a34;
+    --bg: #0a101a;
+    --surface: #121b2a;
+    --surface-alt: #1b283d;
+    --border: #2d3e58;
+    --text: #ebf1fb;
+    --muted: #afbdd3;
+    --muted-2: #8498b5;
+    --accent: #85b4ff;
+    --accent-contrast: #0a1422;
+    --accent-soft: #314f78;
     --danger: #fca5a5;
-    --link: #d8b27a;
-    --chip: #15110c;
+    --link: #9dc2ff;
+    --chip: #162131;
+  }
+
+  * {
+    @apply border-[var(--border)];
+  }
+
+  *:focus-visible {
+    @apply outline-none ring-2 ring-[var(--accent)] ring-offset-2 ring-offset-[var(--bg)];
+  }
+
+  html,
+  body {
+    font-family: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   }
 
   body {
-    @apply bg-[var(--bg)] text-[var(--text)];
+    @apply min-h-screen bg-[var(--bg)] text-[var(--text)] antialiased;
+    background-image:
+      radial-gradient(circle at 10% 10%, color-mix(in oklab, var(--accent) 16%, transparent), transparent 38%),
+      radial-gradient(circle at 90% 15%, color-mix(in oklab, var(--accent-soft) 40%, transparent), transparent 32%);
+    transition: background-color 200ms ease, color 200ms ease;
+  }
+
+  button,
+  a {
+    transition: all 160ms ease;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--accent) 30%, white);
+    color: var(--text);
   }
 
   .tiptap {
-    @apply text-sm text-[var(--text)];
+    @apply text-sm leading-7 text-[var(--text)];
   }
 
   .tiptap h1 {
-    @apply text-2xl font-semibold;
+    @apply mb-3 text-3xl font-bold;
   }
 
   .tiptap h2 {
-    @apply text-xl font-semibold;
+    @apply mb-3 mt-6 text-2xl font-semibold;
   }
 
   .tiptap h3 {
-    @apply text-lg font-semibold;
+    @apply mb-2 mt-5 text-xl font-semibold;
   }
 
   .tiptap p {
-    @apply leading-7 text-[var(--text)];
+    @apply mb-4 leading-7 text-[var(--text)];
   }
 
   .tiptap ul {
-    @apply list-disc pl-6 text-[var(--text)];
+    @apply mb-4 list-disc pl-6 text-[var(--text)];
   }
 
   .tiptap ol {
-    @apply list-decimal pl-6 text-[var(--text)];
+    @apply mb-4 list-decimal pl-6 text-[var(--text)];
   }
 
   .tiptap blockquote {
-    @apply border-l-2 border-[var(--border)] pl-4 italic text-[var(--muted)];
+    @apply my-4 border-l-4 border-[var(--accent-soft)] pl-4 italic text-[var(--muted)];
   }
 }

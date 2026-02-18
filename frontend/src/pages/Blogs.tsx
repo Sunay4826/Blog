@@ -130,7 +130,7 @@ export const Blogs = () => {
     if (loading) {
         return <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
             <Appbar /> 
-            <div className="mx-auto max-w-5xl px-4 pb-10">
+            <div className="mx-auto max-w-5xl space-y-4 px-4 pb-10 pt-6">
                     <BlogSkeleton />
                     <BlogSkeleton />
                     <BlogSkeleton />
@@ -142,7 +142,7 @@ export const Blogs = () => {
 
     return <div className="min-h-screen bg-[var(--bg)] text-[var(--text)]">
         <Appbar />
-        <div className="mx-auto max-w-5xl px-4 pb-10">
+        <div className="mx-auto max-w-5xl px-4 pb-10 pt-2">
                 <div className="mt-6 flex flex-wrap items-center gap-3 rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-4 shadow-sm">
                     <input
                         value={search}

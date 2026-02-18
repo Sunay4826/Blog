@@ -33,6 +33,7 @@ const signinSchema = z.object({
 
 export const Auth = ({ type }: { type: "signup" | "signin" }) => {
     const navigate = useNavigate();
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [postInputs, setPostInputs] = useState<SignupInput>({
         name: "",
         email: "",
@@ -46,7 +47,9 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
     }>({});
 
     const sendRequest = useCallback(async () => {
+        if (isSubmitting) return;
         try {
+            setIsSubmitting(true);
             const payload: SignupInput | SigninInput =
                 type === "signup"
                     ? postInputs
@@ -83,10 +86,12 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
             setErrors({
                 form:
                     (e as { response?: { data?: { message?: string } } })?.response
-                        ?.data?.message || "Unable to sign in."
+                        ?.data?.message || `Unable to ${type}.`
             });
+        } finally {
+            setIsSubmitting(false);
         }
-    }, [navigate, postInputs, type]);
+    }, [isSubmitting, navigate, postInputs, type]);
 
     const handleNameChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         setPostInputs((prev: SignupInput) => ({
@@ -115,7 +120,7 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
     return (
         <div className="flex h-full flex-col justify-center px-10 py-12">
             <div>
-                <div className="text-3xl font-semibold text-[var(--text)]">
+                <div className="text-3xl font-bold tracking-tight text-[var(--text)]">
                     {type === "signup" ? "Create an account" : "Welcome back"}
                 </div>
                 <div className="mt-2 text-sm text-[var(--muted)]">
@@ -125,7 +130,13 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
                     </Link>
                 </div>
             </div>
-            <div className="pt-8">
+            <form
+                className="pt-8"
+                onSubmit={(event) => {
+                    event.preventDefault();
+                    sendRequest();
+                }}
+            >
                 {errors.form ? (
                     <div className="mb-4 rounded-lg border border-[var(--border)] bg-[var(--surface)] px-4 py-3 text-sm text-[var(--danger)]">
                         {errors.form}
@@ -153,13 +164,13 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
                     error={errors.password}
                 />
                 <button
-                    onClick={sendRequest}
-                    type="button"
-                    className="mt-8 w-full rounded-lg bg-[var(--accent)] px-4 py-2.5 text-sm font-semibold text-[var(--accent-contrast)] transition hover:opacity-90"
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="mt-8 w-full rounded-xl bg-[var(--accent)] px-4 py-3 text-sm font-semibold text-[var(--accent-contrast)] shadow-[0_10px_24px_-14px_var(--accent)] transition hover:-translate-y-0.5 hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-70"
                 >
-                    {type === "signup" ? "Sign up" : "Sign in"}
+                    {isSubmitting ? "Please wait..." : type === "signup" ? "Sign up" : "Sign in"}
                 </button>
-            </div>
+            </form>
         </div>
     )
 }
@@ -181,7 +192,7 @@ function LabelledInput({ label, placeholder, onChange, type, error }: LabelledIn
             <input
                 onChange={onChange}
                 type={type || "text"}
-                className={`block w-full rounded-lg border bg-[var(--surface)] px-4 py-2.5 text-sm text-[var(--text)] placeholder:text-[var(--muted-2)] focus:border-[var(--accent)] focus:outline-none ${
+                className={`block w-full rounded-xl border bg-[var(--surface)] px-4 py-3 text-sm text-[var(--text)] placeholder:text-[var(--muted-2)] focus:border-[var(--accent)] focus:outline-none ${
                     error ? "border-[var(--danger)]" : "border-[var(--border)]"
                 }`}
                 placeholder={placeholder}
